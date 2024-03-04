@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+
 import matplotlib.pyplot as plt
 
 donnees = pd.read_csv('insurance.csv')
@@ -25,18 +26,18 @@ modele_femmes = LinearRegression().fit(donnees_femmes[['age', 'smoker']], donnee
 donnees_hommes['prediction'] = modele_hommes.predict(donnees_hommes[['age', 'smoker']])
 donnees_femmes['prediction'] = modele_femmes.predict(donnees_femmes[['age', 'smoker']])
 
+# Calculate the average prediction for each age
+average_hommes = donnees_hommes.groupby('age')['prediction'].mean()
+average_femmes = donnees_femmes.groupby('age')['prediction'].mean()
+
 # Visualisation
 plt.figure(figsize=(10, 6))
 
 plt.scatter(donnees_hommes['age'], donnees_hommes['charges'], color='red', label='Hommes', alpha=0.5)
 plt.scatter(donnees_femmes['age'], donnees_femmes['charges'], color='blue', label='Femmes', alpha=0.5)
 
-# Tri des données pour le tracé de la ligne
-indices_sorted_hommes = donnees_hommes['age'].argsort()
-indices_sorted_femmes = donnees_femmes['age'].argsort()
-
-plt.plot(donnees_hommes['age'].iloc[indices_sorted_hommes], donnees_hommes['prediction'].iloc[indices_sorted_hommes], color='violet', label='Ligne Hommes')
-plt.plot(donnees_femmes['age'].iloc[indices_sorted_femmes], donnees_femmes['prediction'].iloc[indices_sorted_femmes], color='green', label='Ligne Femmes')
+plt.plot(average_hommes.index, average_hommes.values, color='violet', label='Ligne Hommes')
+plt.plot(average_femmes.index, average_femmes.values, color='green', label='Ligne Femmes')
 
 plt.title("Charges d'assurance par âge, sexe et statut de fumeur")
 plt.xlabel('Âge')
